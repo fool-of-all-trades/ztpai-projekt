@@ -1,0 +1,66 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    ports:
+      - "8081:80"
+    volumes:
+      - ./public:/app/public
+    depends_on:
+      - php
+    networks:
+      - pg-network
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - .:/app
+      - ./var:/app/var
+    env_file:
+      - .env.example
+    depends_on:
+      - db
+    networks:
+      - pg-network
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppass
+    ports:
+      - "5434:5432" # host/me:container
+    volumes:
+      - pg-data:/var/lib/postgresql/data # data persistence
+      - ./database/init:/docker-entrypoint-initdb.d:ro # auto-init schema
+    networks:
+      - pg-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5051:80"
+    depends_on:
+      - db
+    networks:
+      - pg-network
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "8025:8025" # Web UI
+      - "1025:1025" # SMTP
+
+networks:
+  pg-network:
+
+volumes:
+  pg-data:
