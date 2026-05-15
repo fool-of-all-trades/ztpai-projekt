@@ -104,12 +104,6 @@ data/
 *.dump
 *.sql.gz
 
-# -------------------------
-# Uploaded / generated user files
-# Only keep if your app creates these locally
-# -------------------------
-uploads/
-storage/
 
 mail.log
 product_manager.txt
