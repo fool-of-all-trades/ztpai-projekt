@@ -1,0 +1,117 @@
+# =========================================================
+# Project: Spring Boot + Angular + Docker/PostgreSQL
+# =========================================================
+
+# -------------------------
+# Secrets / environment
+# -------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.keystore
+
+# -------------------------
+# Java / Spring / Maven
+# -------------------------
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven wrapper generated files, if ever added
+.mvn/wrapper/maven-wrapper.jar
+
+# Spring Boot logs / runtime
+*.log
+logs/
+spring.log
+
+# -------------------------
+# Angular / Node
+# -------------------------
+node_modules/
+**/node_modules/
+
+dist/
+**/dist/
+.angular/
+**/.angular/
+
+coverage/
+**/coverage/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Optional package manager caches
+.npm/
+.pnpm-store/
+
+# -------------------------
+# IDEs / editors
+# -------------------------
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+.classpath
+.project
+.settings/
+
+# -------------------------
+# OS files
+# -------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# -------------------------
+# Temporary files
+# -------------------------
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.cache/
+
+# -------------------------
+# Test / build artifacts
+# -------------------------
+surefire-reports/
+failsafe-reports/
+
+# -------------------------
+# Docker / database local data
+# -------------------------
+docker-data/
+postgres-data/
+pgdata/
+data/
+*.dump
+*.sql.gz
+
+# -------------------------
+# Uploaded / generated user files
+# Only keep if your app creates these locally
+# -------------------------
+uploads/
+storage/
+
+mail.log
+product_manager.txt
+var/log/
+*.log
