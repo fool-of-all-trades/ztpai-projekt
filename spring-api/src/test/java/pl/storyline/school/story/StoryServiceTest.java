@@ -142,5 +142,121 @@ class StoryServiceTest {
         verifyNoInteractions(storyRepository);
     }
 
+    @Test
+    void updateRejectsNonOwnerBeforeChangingStory() {
+        Story story = story(5L, user(1L, "alice"), quote(10L));
+        when(storyRepository.findById(5L)).thenReturn(Optional.of(story));
 
+        assertThatThrownBy(() -> storyService.update(
+                5L,
+                new StoryUpdateRequest("Changed", "Changed content"),
+                "bob"
+        ))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(ex -> ((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.FORBIDDEN);
+
+        verifyNoInteractions(quoteService);
+    }
+
+    @Test
+    void updateRejectsContentWithoutLinkedQuote() {
+        Story story = story(5L, user(1L, "alice"), quote(10L));
+        when(storyRepository.findById(5L)).thenReturn(Optional.of(story));
+
+        assertThatThrownBy(() -> storyService.update(
+                5L,
+                new StoryUpdateRequest("Changed", "The prompt was removed from this update."),
+                "alice"
+        ))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(ex -> ((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.BAD_REQUEST);
+
+        assertThat(story.getContent()).isEqualTo("Original content with A test quote.");
+    }
+
+    @Test
+    void updateKeepsExistingQuoteWhenContentIncludesLinkedQuote() {
+        Story story = story(5L, user(1L, "alice"), quote(10L));
+        when(storyRepository.findById(5L)).thenReturn(Optional.of(story));
+
+        StoryResponse response = storyService.update(
+                5L,
+                new StoryUpdateRequest("Changed", "A test quote. Updated content."),
+                "alice"
+        );
+
+        assertThat(response.content()).isEqualTo("A test quote. Updated content.");
+        assertThat(response.quote().id()).isEqualTo(10L);
+    }
+
+    @Test
+    void createRejectsContentOverFiveHundredWords() {
+        AppUser author = user(1L, "alice");
+        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(author));
+        when(quoteService.quoteForDate(any(LocalDate.class))).thenReturn(quote(10L));
+
+        assertThatThrownBy(() -> storyService.create(
+                new StoryCreateRequest("Long Story", words(501)),
+                "alice"
+        ))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(ex -> ((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.BAD_REQUEST);
+
+        verify(storyRepository, never()).save(any(Story.class));
+    }
+
+    @Test
+    void updateRejectsContentOverFiveHundredWords() {
+        Story story = story(5L, user(1L, "alice"), quote(10L));
+        when(storyRepository.findById(5L)).thenReturn(Optional.of(story));
+
+        assertThatThrownBy(() -> storyService.update(
+                5L,
+                new StoryUpdateRequest("Changed", words(501)),
+                "alice"
+        ))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting(ex -> ((ResponseStatusException) ex).getStatusCode())
+                .isEqualTo(HttpStatus.BAD_REQUEST);
+
+        assertThat(story.getContent()).isEqualTo("Original content with A test quote.");
+    }
+
+    @Test
+    void deleteAllowsOwner() {
+        Story story = story(5L, user(1L, "alice"), quote(10L));
+        when(storyRepository.findById(5L)).thenReturn(Optional.of(story));
+
+        storyService.delete(5L, "alice");
+
+        verify(storyRepository).delete(story);
+    }
+
+    private AppUser user(Long id, String username) {
+        AppUser user = new AppUser(username, "hash");
+        ReflectionTestUtils.setField(user, "id", id);
+        ReflectionTestUtils.setField(user, "createdAt", Instant.parse("2026-05-12T09:00:00Z"));
+        return user;
+    }
+
+    private Quote quote(Long id) {
+        Quote quote = new Quote("A test quote.", "Tester", "Unit test");
+        ReflectionTestUtils.setField(quote, "id", id);
+        return quote;
+    }
+
+    private Story story(Long id, AppUser author, Quote quote) {
+        Story story = new Story("Original", "Original content with A test quote.", author, quote, LocalDate.parse("2026-05-12"));
+        ReflectionTestUtils.setField(story, "id", id);
+        ReflectionTestUtils.setField(story, "createdAt", Instant.parse("2026-05-12T10:00:00Z"));
+        ReflectionTestUtils.setField(story, "updatedAt", Instant.parse("2026-05-12T10:00:00Z"));
+        return story;
+    }
+
+    private String words(int count) {
+        return "word ".repeat(count).strip();
+    }
 }
