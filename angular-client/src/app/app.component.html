@@ -1,0 +1,22 @@
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" routerLink="/dashboard">{{ appName }}</a>
+
+    <nav class="nav" aria-label="Primary navigation">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/stories" routerLinkActive="active">Stories</a>
+      @if (isAuthenticated()) {
+        <a routerLink="/my-stories" routerLinkActive="active">My Stories</a>
+        <span class="user-label">{{ currentUser()?.username }}</span>
+        <button type="button" class="nav-button" (click)="logout()">Logout</button>
+      } @else {
+        <a routerLink="/login" routerLinkActive="active">Login</a>
+        <a routerLink="/register" routerLinkActive="active">Register</a>
+      }
+    </nav>
+  </header>
+
+  <main class="page">
+    <router-outlet />
+  </main>
+</div>
