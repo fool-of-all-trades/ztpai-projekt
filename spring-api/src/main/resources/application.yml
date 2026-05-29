@@ -2,9 +2,9 @@ spring:
   application:
     name: storyline-school-api
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/storyline_school}
-    username: ${SPRING_DATASOURCE_USERNAME:storyline}
-    password: ${SPRING_DATASOURCE_PASSWORD:storyline}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/storyline_school}
+    username: ${SPRING_DATASOURCE_USERNAME:appuser}
+    password: ${SPRING_DATASOURCE_PASSWORD:apppass}
   jpa:
     hibernate:
       ddl-auto: validate

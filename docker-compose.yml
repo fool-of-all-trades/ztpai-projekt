@@ -29,7 +29,7 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_DB: appdb
+      POSTGRES_DB: storyline_school
       POSTGRES_USER: appuser
       POSTGRES_PASSWORD: apppass
     ports:

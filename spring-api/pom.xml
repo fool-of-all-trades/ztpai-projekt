@@ -14,7 +14,7 @@
     <groupId>pl.storyline</groupId>
     <artifactId>school-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Storyline School API</name>
+    <name>Storyline API</name>
     <description>Compact Spring Boot API for a school Story CRUD project.</description>
 
     <properties>
